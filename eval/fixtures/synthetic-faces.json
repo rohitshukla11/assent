@@ -1,0 +1,40 @@
+{
+  "note": "Synthetic eval faces made with Muse Image (scripts/synthetic-faces.ts). No real person; no image data here.",
+  "wrongFace": {
+    "file": "wrong-face.jpg",
+    "prompt": "A photorealistic head-and-shoulders portrait of an invented adult man, about 45 years old, short dark hair with some grey, light stubble, wearing a navy crew-neck sweater, calm expression, looking straight at the camera, plain light-grey studio background, soft even light. A fictional person who does not resemble any real or famous person. One person only.",
+    "references": "none (text only)",
+    "model": "muse-image-1.0",
+    "aspect": "1:1",
+    "reasoningStrength": "high",
+    "temperature": 0.6,
+    "topP": 0.9,
+    "latencyMs": 14400,
+    "usage": null,
+    "at": "2026-10-30",
+    "recordNote": "Entered by hand: this run stopped at the two-person call (HTTP 400 on size 1792x1008) before the record was written; the latency is from the console (14.4 s); usage wasn't kept."
+  },
+  "twoPeople": {
+    "file": "two-people.jpg",
+    "prompt": "Make one new photo of exactly these two people standing side by side in a sunlit caf\u00e9, in a square photo: the woman from the first photo and the man from the second photo. Keep each face as it is in their photo. Both face the camera, both faces fully visible and unobstructed, medium shot from the waist up, natural light. Two people only, nobody else.",
+    "references": "maya.jpg (first) and wrong-face.jpg (second)",
+    "model": "muse-image-1.0",
+    "aspect": "1:1",
+    "reasoningStrength": "high",
+    "temperature": 0.6,
+    "topP": 0.9,
+    "latencyMs": 14528,
+    "usage": {
+      "input_tokens": 13057,
+      "input_tokens_details": {
+        "cached_tokens": 9536
+      },
+      "output_tokens": 845,
+      "output_tokens_details": {
+        "reasoning_tokens": 201
+      },
+      "total_tokens": 13902
+    },
+    "at": "2026-10-29T18:33:01.559Z"
+  }
+}

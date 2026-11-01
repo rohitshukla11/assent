@@ -1,0 +1,107 @@
+{
+  "note": "One real Muse Image call (scripts/muse-image-check.ts). Every base64 string is cut short; the reference photos are the synthetic demo creator's.",
+  "at": "2026-10-29T18:19:28.911Z",
+  "latencyMs": 30960,
+  "request": {
+    "model": "muse-image-1.0",
+    "input": [
+      {
+        "type": "message",
+        "role": "user",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "Reference photos of the licensed person (3):"
+          },
+          {
+            "type": "input_image",
+            "image_url": "data:image/jpeg;base64,/9j/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoM…(248572 base64 chars)"
+          },
+          {
+            "type": "input_image",
+            "image_url": "data:image/jpeg;base64,/9j/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoM…(232064 base64 chars)"
+          },
+          {
+            "type": "input_image",
+            "image_url": "data:image/jpeg;base64,/9j/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoM…(242100 base64 chars)"
+          },
+          {
+            "type": "input_text",
+            "text": "The 3 images show one real, consenting adult who has licensed their likeness for this image.\nGenerate a new photorealistic image of exactly this person, keeping their face, identity and likeness faithful to the reference photos.\nDo not add text, logos or watermarks unless asked.\nBrief: Smiling in a sunlit café holding a ceramic coffee cup, product shot for a spring campaign\nFraming: medium close-up of the person, the full head and face visible with clear headroom above the hair, eyes in the upper third, looking toward the camera with a natural expression; never crop the forehead, chin or face; hands and any product fully inside the frame. Square framing: the person centred, clean space on one side for a headline. No text, logos or watermarks in the image."
+          }
+        ]
+      }
+    ],
+    "store": false,
+    "stream": false,
+    "temperature": 0.6,
+    "top_p": 0.9,
+    "max_output_tokens": 2048,
+    "tools": [
+      {
+        "type": "image_generation",
+        "enable_image_search": false,
+        "enable_web_search": false,
+        "enable_shell": false,
+        "output_format": "png",
+        "reasoning_strength": "high",
+        "size": "1024x1024"
+      }
+    ]
+  },
+  "response": {
+    "model": "muse-image-1.0",
+    "id": "resp_6ae38e2f8fb984774a4a41b0",
+    "object": "response",
+    "status": "completed",
+    "created_at": 1793297967,
+    "error": null,
+    "incomplete_details": null,
+    "output": [
+      {
+        "type": "reasoning",
+        "id": "rs_6ae38e2f5f55710c34f14874",
+        "summary": [
+          {
+            "type": "summary_text",
+            "text": "**Composing cafe portrait scene**\nI'm building a photorealistic medium close-up in a sunlit cafe, centering the person with full headroom and clear eyes in the upper third, holding a ceramic coffee cup with hands and product fully in frame for a square spring campaign shot.\n**Composing cafe portrait scene**\nI'm arranging the square cafe portrait with the subject centered, hands holding a beige ceramic cup, smiling in a mustard sweater, natural light and blurred greenery behind, and leaving clean space on the right for a headline.\n**Generating image with right space**\nI'm creating a new version of the cafe portrait with clear negative space on the right side, keeping the subject, lighting, and composition consistent with the previous image."
+          }
+        ],
+        "status": "completed"
+      },
+      {
+        "type": "message",
+        "id": "msg_6ae38e2fa241aa890966479b",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "",
+            "annotations": [],
+            "logprobs": []
+          }
+        ],
+        "status": "completed"
+      },
+      {
+        "type": "image_generation_call",
+        "id": "ig_eyJwZXJtYW5lbnRfdXJsIjoiR0JPTWREVDk2V0hsRFA4REFNaDlyakJQRXBaTmJnMWlBUUFEIiwicmVzdW1lX2lkIjoiczphM2U5Njk5Mi05ZDMzLTRjYjktOGRiYy1mMjIzOWJjMGUxZGQ6R0V6UmN6UjNyRXU0RjJjR0FKRDdsa1NkZTZoOWJnMWlBUUJqIiwiYmluZGluZyI6eyJhcHBfaWQiOjE4Nzk5MTczNDk4NDg5MDEsIm1vZGVsIjoibXVzZS1pbWFnZS0xLjAifSwidmVyc2lvbiI6MSwiY3JlYXRlZF9hdCI6MTc5MzI5Nzk2N30.Q8WLFwF6we92PGNhOCcy-rWiXtpI",
+        "status": "completed",
+        "result": "iVBORw0KGgoAAAANSUhEUgAABkAAAAZACAIAAACubhnwAAAB…(4468880 base64 chars)"
+      }
+    ],
+    "instructions": null,
+    "usage": {
+      "input_tokens": 28275,
+      "input_tokens_details": {
+        "cached_tokens": 21568
+      },
+      "output_tokens": 1793,
+      "output_tokens_details": {
+        "reasoning_tokens": 343
+      },
+      "total_tokens": 30068
+    },
+    "parallel_tool_calls": false
+  }
+}

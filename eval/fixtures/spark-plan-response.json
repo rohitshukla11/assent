@@ -1,0 +1,241 @@
+{
+  "note": "One real Muse Spark call (scripts/spark-check.ts): planShots on the eval licence. Request body and response as sent and received; no headers. The reasoning item's encrypted_content is cut short.",
+  "at": "2026-10-29T18:21:17.446Z",
+  "latencyMs": 6822,
+  "httpStatus": 200,
+  "request": {
+    "model": "muse-spark-1.3",
+    "instructions": "You plan shots for an AI ad generator that renders a real, consenting adult under a likeness licence.\nThe licence allows exactly one use: Advertising. Plan only shots for that use; if the brief needs another use, set refused to true and explain in refusalReason.\nNever plan, under any licence (set refused to true instead): political content; adult, sexual or revealing content; anything involving minors or a childlike depiction; impersonation (presenting the person as someone else); deception (fake news, fake evidence, fake reviews or testimonials, staged real events); claims, quotes or endorsements attributed to the person.\nRefer to the person only as \"the person\". Never use or invent a name, job, age, nationality or biography. The product appears in the ad; the person is shown with it, nothing more is claimed. Exactly one person in every shot.\nPlan up to 1 distinct shot(s). For each: prompt = the complete image prompt as one paragraph (at most 900 characters), starting with the subject; rationale = one line on why this shot serves the brief; and the details: subject, action, setting, wardrobe, composition, style.\nFraming for every shot (the server also appends these rules to every render): Framing: medium close-up of the person, the full head and face visible with clear headroom above the hair, eyes in the upper third, looking toward the camera with a natural expression; never crop the forehead, chin or face; hands and any product fully inside the frame.\nYour answer is a proposal: the licence rules are applied by code afterwards. Return JSON matching the schema.",
+    "input": [
+      {
+        "type": "message",
+        "role": "user",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "Brief: Smiling in a sunlit café holding a ceramic coffee cup, product shot for a spring campaign\nIdea: (none: a simple product ad)\nProduct: ceramic coffee cup\nSetting: sunlit café\nMood: warm\nAspect: 1:1\nShots wanted: 1"
+          }
+        ]
+      }
+    ],
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "shot_plan",
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "refused",
+            "refusalReason",
+            "shots"
+          ],
+          "properties": {
+            "refused": {
+              "type": "boolean"
+            },
+            "refusalReason": {
+              "type": "string",
+              "maxLength": 400
+            },
+            "shots": {
+              "type": "array",
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "prompt",
+                  "rationale",
+                  "subject",
+                  "action",
+                  "setting",
+                  "wardrobe",
+                  "composition",
+                  "style"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 1200
+                  },
+                  "rationale": {
+                    "type": "string",
+                    "maxLength": 300
+                  },
+                  "subject": {
+                    "type": "string",
+                    "maxLength": 400
+                  },
+                  "action": {
+                    "type": "string",
+                    "maxLength": 400
+                  },
+                  "setting": {
+                    "type": "string",
+                    "maxLength": 400
+                  },
+                  "wardrobe": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "composition": {
+                    "type": "string",
+                    "maxLength": 400
+                  },
+                  "style": {
+                    "type": "string",
+                    "maxLength": 200
+                  }
+                }
+              }
+            }
+          }
+        },
+        "strict": true
+      }
+    },
+    "store": false,
+    "stream": false,
+    "temperature": 0.7,
+    "max_output_tokens": 4096
+  },
+  "response": {
+    "top_logprobs": 0,
+    "temperature": 0.7,
+    "top_p": 1,
+    "service_tier": "auto",
+    "model": "muse-spark-1.3",
+    "reasoning": {
+      "effort": "high"
+    },
+    "background": false,
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "shot_plan",
+        "schema": {
+          "required": [
+            "refused",
+            "refusalReason",
+            "shots"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "refusalReason": {
+              "maxLength": 400,
+              "type": "string"
+            },
+            "refused": {
+              "type": "boolean"
+            },
+            "shots": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "action": {
+                    "maxLength": 400,
+                    "type": "string"
+                  },
+                  "composition": {
+                    "maxLength": 400,
+                    "type": "string"
+                  },
+                  "prompt": {
+                    "maxLength": 1200,
+                    "minLength": 3,
+                    "type": "string"
+                  },
+                  "rationale": {
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "setting": {
+                    "maxLength": 400,
+                    "type": "string"
+                  },
+                  "style": {
+                    "maxLength": 200,
+                    "type": "string"
+                  },
+                  "subject": {
+                    "maxLength": 400,
+                    "type": "string"
+                  },
+                  "wardrobe": {
+                    "maxLength": 200,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "prompt",
+                  "rationale",
+                  "subject",
+                  "action",
+                  "setting",
+                  "wardrobe",
+                  "composition",
+                  "style"
+                ],
+                "type": "object"
+              },
+              "maxItems": 4,
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "strict": true
+      }
+    },
+    "tools": [],
+    "tool_choice": "auto",
+    "truncation": "disabled",
+    "id": "resp_6ae38e9d6246507b85c6445c",
+    "object": "response",
+    "status": "completed",
+    "created_at": 1793298076,
+    "completed_at": 1793298077,
+    "error": null,
+    "incomplete_details": null,
+    "output": [
+      {
+        "type": "reasoning",
+        "id": "rs_6ae38e9d6246507b85c6445c:rs_65a5b6b2-3fc7-49a8-afb3-e45fefdf3ea7",
+        "encrypted_content": "Q-PaDgG4hnIJWiot8SzYD8uGSKkwjbKJJBVZ1bHNzcaz-kF6…(21906 chars cut)",
+        "summary": [],
+        "status": "completed"
+      },
+      {
+        "type": "message",
+        "id": "msg_ab31d7f1-da26-4735-a433-6912b064e3ca",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "{\"refusalReason\": \"\", \"refused\": false, \"shots\": [{\"action\": \"smiling warmly and holding a ceramic coffee cup with both hands, looking toward the camera\", \"composition\": \"medium close-up centered for 1:1, full head with headroom, eyes in upper third, hands and product fully in frame\", \"prompt\": \"the person smiling warmly toward the camera while holding a ceramic coffee cup with both hands in a sunlit caf\\u00e9, bright warm morning sunlight streaming through large windows, cozy caf\\u00e9 interior with blurred wooden tables and green plants behind, wearing a light beige knit sweater, medium close-up with full head and face visible with clear headroom above the hair, eyes in the upper third, hands and cup fully inside the frame, natural relaxed expression, warm fresh spring advertising product photography\", \"rationale\": \"Shows the person with the ceramic cup in a sunlit cafe to deliver a warm spring product ad.\", \"setting\": \"sunlit caf\\u00e9 interior with warm daylight, blurred tables and plants in background\", \"style\": \"warm natural advertising photography, soft sunlight, fresh spring campaign look\", \"subject\": \"the person with full head and face visible\", \"wardrobe\": \"light beige knit sweater, modest casual spring clothing\"}]}",
+            "annotations": [],
+            "logprobs": []
+          }
+        ],
+        "status": "completed"
+      }
+    ],
+    "instructions": "You plan shots for an AI ad generator that renders a real, consenting adult under a likeness licence.\nThe licence allows exactly one use: Advertising. Plan only shots for that use; if the brief needs another use, set refused to true and explain in refusalReason.\nNever plan, under any licence (set refused to true instead): political content; adult, sexual or revealing content; anything involving minors or a childlike depiction; impersonation (presenting the person as someone else); deception (fake news, fake evidence, fake reviews or testimonials, staged real events); claims, quotes or endorsements attributed to the person.\nRefer to the person only as \"the person\". Never use or invent a name, job, age, nationality or biography. The product appears in the ad; the person is shown with it, nothing more is claimed. Exactly one person in every shot.\nPlan up to 1 distinct shot(s). For each: prompt = the complete image prompt as one paragraph (at most 900 characters), starting with the subject; rationale = one line on why this shot serves the brief; and the details: subject, action, setting, wardrobe, composition, style.\nFraming for every shot (the server also appends these rules to every render): Framing: medium close-up of the person, the full head and face visible with clear headroom above the hair, eyes in the upper third, looking toward the camera with a natural expression; never crop the forehead, chin or face; hands and any product fully inside the frame.\nYour answer is a proposal: the licence rules are applied by code afterwards. Return JSON matching the schema.",
+    "usage": {
+      "input_tokens": 610,
+      "input_tokens_details": {
+        "cached_tokens": 0
+      },
+      "output_tokens": 1668,
+      "output_tokens_details": {
+        "reasoning_tokens": 1390
+      },
+      "total_tokens": 2278
+    },
+    "parallel_tool_calls": true,
+    "store": false,
+    "max_output_tokens": 4096
+  }
+}
