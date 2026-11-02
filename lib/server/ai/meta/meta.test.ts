@@ -37,10 +37,10 @@ describe("Muse Image request", () => {
     }
   });
 
-  it("stores nothing, doesn't stream, asks for PNG, and uses the console defaults", () => {
+  it("stores nothing, doesn't stream, asks for PNG, uses the console defaults, and reasoning strength low", () => {
     const b = museImageRequest([jpegRef], "Holding a cup", { aspectRatio: "1:1" }, museImageConfig());
     expect(b).toMatchObject({ model: "muse-image-1.0", store: false, stream: false, temperature: 0.6, top_p: 0.9, max_output_tokens: 2048 });
-    expect(b.tools[0]).toMatchObject({ type: "image_generation", output_format: "png", reasoning_strength: "high" });
+    expect(b.tools[0]).toMatchObject({ type: "image_generation", output_format: "png", reasoning_strength: "low" });
     expect(b.input[0]).toMatchObject({ type: "message", role: "user" });
   });
 
@@ -53,7 +53,7 @@ describe("Muse Image request", () => {
   });
 
   it("multiImage: each reference, then the product photo last, named in the text", () => {
-    const p = parts(museImageRequest([jpegRef, jpegRef], "Holding the bottle", { aspectRatio: "16:9" }, museImageConfig(), productRef));
+    const p = parts(museImageRequest([jpegRef, jpegRef], "Holding the bottle", { aspectRatio: "1:1" }, museImageConfig(), productRef));
     expect(p.map((x) => x.type)).toEqual(["input_text", "input_image", "input_image", "input_text", "input_image", "input_text"]);
     expect(p[3].text).toBe("The brand's product photo:");
     expect(p[4].image_url).toMatch(/^data:image\/png;base64,/);
@@ -61,9 +61,12 @@ describe("Muse Image request", () => {
     expect(p[5].text).toMatch(/Brief: Holding the bottle/);
   });
 
-  it("maps the aspect to the tool's size, and leaves it to the model when none is given", () => {
-    const size = (a?: "1:1" | "16:9" | "9:16") => (museImageRequest([jpegRef], "x y z", { aspectRatio: a }, museImageConfig()).tools[0] as { size: string }).size;
-    expect([size("1:1"), size("16:9"), size("9:16"), size(undefined)]).toEqual([MUSE_IMAGE_SIZES["1:1"], "1792x1008", "1008x1792", "auto"]);
+  it("maps the aspect to the tool's size, refuses aspects it can't make, and leaves it to the model when none is given", () => {
+    const size = (a?: "1:1" | "3:2" | "2:3" | "16:9" | "9:16") => (museImageRequest([jpegRef], "x y z", { aspectRatio: a }, museImageConfig()).tools[0] as { size: string }).size;
+    expect([size("1:1"), size("3:2"), size("2:3"), size(undefined)]).toEqual(["1024x1024", "1536x1024", "1024x1536", "auto"]);
+    expect(() => size("16:9")).toThrow(/can't make 16:9/);
+    expect(() => size("9:16")).toThrow(/can't make 9:16/);
+    expect(Object.keys(MUSE_IMAGE_SIZES)).toEqual(["1:1", "3:2", "2:3"]);
   });
 
   it("takes temperature, top_p, max tokens and reasoning strength from configuration, and rejects bad values", () => {
@@ -137,7 +140,7 @@ describe("Muse Image generator", () => {
     const logs = [vi.spyOn(console, "log"), vi.spyOn(console, "error"), vi.spyOn(console, "warn"), vi.spyOn(console, "info"), vi.spyOn(console, "debug")];
     const out = await museImageGenerator.edit([jpegRef], "Holding a cup", { aspectRatio: "1:1", quality: "full", licenceId: "L", renderIndex: 0 });
     expect(out.mime).toBe("image/png");
-    expect(out.metrics).toMatchObject({ provider: "meta", model: "muse-image-1.0", cost: { costUsd: 0.01, estimate: true }, settings: { reasoning_strength: "high", size: "1024x1024" } });
+    expect(out.metrics).toMatchObject({ provider: "meta", model: "muse-image-1.0", cost: { costUsd: 0.01, estimate: true }, settings: { reasoning_strength: "low", size: "1024x1024" } });
     for (const l of logs) expect(l).not.toHaveBeenCalled();
   });
 });

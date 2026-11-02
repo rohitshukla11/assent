@@ -125,9 +125,10 @@ describe("SAM segmenter", () => {
     vi.unstubAllGlobals();
   });
 
-  it("sends the concept and the image as a data URL, streamed, one_bit masks, no file upload", () => {
+  it("sends the concept and the image as a data URL, streamed, store false, one_bit masks, no file upload", () => {
     const b = samRequest(image);
-    expect(b).toMatchObject({ model: "sam-3.1", stream: true, metadata: { mask_encoding: "one_bit" } });
+    expect(b).toMatchObject({ model: "sam-3.1", stream: true, store: false, metadata: { mask_encoding: "one_bit" } });
+    expect(samRequest(image, { sendStore: false })).not.toHaveProperty("store");
     expect(b.input[0].content[0]).toEqual({ type: "input_text", text: "person" });
     expect(b.input[0].content[1].image_url).toMatch(/^data:image\/png;base64,/);
     expect(JSON.stringify(b)).not.toMatch(/file_id|https?:\/\//);

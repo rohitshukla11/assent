@@ -46,10 +46,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!configured) return;
     return onAuthStateChanged(auth(), async (u) => {
+      // Loading again until the account arrives (a cold start can take several seconds): no page treats a
+      // signed-in user whose account hasn't loaded as having no role.
+      setLoading(!!u);
       setUser(u);
       try {
         if (u) setMe(await api<Me>("/api/me"));
         else setMe(null);
+      } catch {
+        setMe(null);
       } finally {
         setLoading(false);
       }

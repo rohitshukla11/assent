@@ -1,0 +1,15 @@
+# What `gcloud builds submit` (scripts/deploy-gcp.sh) must never upload: secrets, local env files, local
+# data and models (the image downloads the face models itself), build output and git history.
+.gcloudignore
+.git/
+.gitignore
+.secrets/
+.env*
+!.env.example
+.data/
+.data-demo/
+.models/
+node_modules/
+.next/
+*.tsbuildinfo
+*.log

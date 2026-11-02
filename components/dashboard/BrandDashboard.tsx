@@ -6,6 +6,7 @@ import { StatusBadge, inputClass } from "@/components/ui";
 import type { Me } from "@/components/auth/AuthProvider";
 import { api, reason } from "@/lib/client/firebase";
 import type { Aspect } from "@/lib/creative";
+import { utcDay } from "@/lib/dates";
 import { AUTO_APPROVED_LABEL, credits, DEMO_TOPUP, useLabel } from "@/lib/model";
 import { CreativeAssistant } from "./CreativeAssistant";
 import { ErrorNotice } from "./ErrorNotice";
@@ -162,7 +163,7 @@ function LicenceCard({ l, aspects, onRendered, onBlocked }: { l: LicenceRow; asp
         <b>{l.creatorName}</b>
         {l.autoApproved && <span className="rounded-full bg-wait-bg px-2.5 py-0.5 text-[12px] font-semibold text-wait">{AUTO_APPROVED_LABEL}</span>}
         <span className="text-grey">
-          {useLabel(l.use)} · {l.renderCount}/{l.maxRenders} renders · {l.pricePerImage} credits per image · until {when(l.end)}
+          {useLabel(l.use)} · {l.renderCount}/{l.maxRenders} renders · {l.pricePerImage} credits per image · until {utcDay(l.end)}
         </span>
       </span>
       {l.status === "Active" && (

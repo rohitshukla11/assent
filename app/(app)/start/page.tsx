@@ -5,6 +5,7 @@ import { AppPage, Card, pillClass } from "@/components/ds";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { JudgeSignIn } from "@/components/auth/JudgeSignIn";
 import { api, reason, signIn } from "@/lib/client/firebase";
+import { startView } from "@/lib/startView";
 
 /** After sign-in: choose to be a creator or a brand (you can do both later). */
 export default function StartPage() {
@@ -13,10 +14,11 @@ export default function StartPage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  const view = startView({ loading, signedIn: !!user, me });
+  const to = view.kind === "redirect" ? view.to : null;
   useEffect(() => {
-    if (me?.user.role === "creator") router.replace(me.creator?.status === "live" ? "/dashboard" : "/creator/onboard");
-    if (me?.user.role === "brand") router.replace("/dashboard");
-  }, [me, router]);
+    if (to) router.replace(to);
+  }, [to, router]);
 
   async function choose(role: "creator" | "brand") {
     setBusy(true);
@@ -32,7 +34,22 @@ export default function StartPage() {
     }
   }
 
-  if (!loading && !user)
+  if (view.kind === "loading" || view.kind === "redirect")
+    return (
+      <AppPage title={view.kind === "loading" ? "Signing you in…" : "Opening your dashboard…"} description="This can take a few seconds when the server has been idle.">
+        {null}
+      </AppPage>
+    );
+  if (view.kind === "error")
+    return (
+      <AppPage title="Couldn't load your account" description="You're signed in, but the server didn't answer. Try again.">
+        <button type="button" onClick={() => refresh().catch((e) => setErr(reason(e)))} className={pillClass("lime", "self-start")}>
+          Try again
+        </button>
+        {err && <p className="m-0 text-bad">{err}</p>}
+      </AppPage>
+    );
+  if (view.kind === "signin")
     return (
       <AppPage title="Get started" description="Sign in with your Google account to continue.">
         <button type="button" onClick={() => signIn().catch((e) => setErr(reason(e)))} className={pillClass("lime", "self-start")}>

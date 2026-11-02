@@ -81,9 +81,3 @@ export function Field({ label, children, hint, group }: { label: string; childre
 
 export const inputClass = "w-full min-h-11 rounded-[14px] border border-field bg-white px-4 py-2 text-[15px] text-ink placeholder:text-grey";
 
-/** Dates are stored as milliseconds since the epoch. */
-export const fmtDate = (ms: number) => new Date(ms).toISOString().replace("T", " ").slice(0, 16) + " UTC";
-
-export const fmtDay = (ms: number) =>
-  new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
-

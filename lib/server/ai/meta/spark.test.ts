@@ -21,7 +21,7 @@ const bodies = () => fetchMock.mock.calls.map((c) => JSON.parse(String(c[1].body
 const saved = { ...process.env };
 beforeEach(() => {
   process.env.MODEL_API_KEY = "test-key";
-  delete process.env.MUSE_SPARK_REASONING_EFFORT;
+  for (const k of ["", "_PLAN", "_POLICY", "_REVIEW"]) delete process.env[`MUSE_SPARK_REASONING_EFFORT${k}`];
   fetchMock = vi.fn();
   vi.stubGlobal("fetch", fetchMock);
 });
@@ -41,6 +41,16 @@ describe("Muse Spark request", () => {
     expect(sparkRequest({ name: "x", instructions: "i", content: [], schema: POLICY_SCHEMA, temperature: 0 })).toMatchObject({ reasoning: { effort: "low" } });
     process.env.MUSE_SPARK_REASONING_EFFORT = "turbo";
     expect(() => sparkRequest({ name: "x", instructions: "i", content: [], schema: POLICY_SCHEMA, temperature: 0 })).toThrow(/MUSE_SPARK_REASONING_EFFORT/);
+  });
+  it("takes a reasoning effort per kind of call, then the shared one, then the built-in default (plan and review low, policy none)", () => {
+    const req = (kind?: "plan" | "policy" | "review") => sparkRequest({ name: "x", kind, instructions: "i", content: [], schema: POLICY_SCHEMA, temperature: 0 }) as { reasoning?: { effort: string } };
+    expect([req("plan"), req("policy"), req("review"), req()].map((b) => b.reasoning?.effort)).toEqual(["low", undefined, "low", undefined]);
+    process.env.MUSE_SPARK_REASONING_EFFORT = "medium";
+    process.env.MUSE_SPARK_REASONING_EFFORT_PLAN = "low";
+    process.env.MUSE_SPARK_REASONING_EFFORT_REVIEW = "minimal";
+    expect([req("plan"), req("policy"), req("review"), req()].map((b) => b.reasoning?.effort)).toEqual(["low", "medium", "minimal", "medium"]);
+    process.env.MUSE_SPARK_REASONING_EFFORT_POLICY = "fast";
+    expect(() => req("policy")).toThrow(/MUSE_SPARK_REASONING_EFFORT_POLICY must be one of/);
   });
   it("uses only schemas strict mode accepts: objects closed, every property required", () => {
     const strictOk = (s: typeof PLAN_SCHEMA): boolean =>
@@ -119,7 +129,7 @@ describe("Muse Spark brand agent", () => {
 describe("Muse Spark output reviewer", () => {
   const image = { bytes: new Uint8Array([0x89, 0x50, 0x4e, 0x47]), mime: "image/png" as const };
   const s = { id: "s1", prompt: "Holding a ceramic cup in a sunlit café", aspect: "1:1" as const, rationale: "" };
-  const review = (o: Record<string, unknown>) => ({ productMatches: true, settingMatches: true, fitsLicensedUse: true, bannedContent: [], notes: "Looks right.", ...o });
+  const review = (o: Record<string, unknown>) => ({ productMatches: true, settingMatches: true, framingIssues: [], fitsLicensedUse: true, bannedContent: [], notes: "Looks right.", ...o });
 
   it("passes a matching image, sending it only as a data URL", async () => {
     reply(review({}));
@@ -132,6 +142,21 @@ describe("Muse Spark output reviewer", () => {
   it("flags a brief mismatch (wrong product or setting)", async () => {
     reply(review({ productMatches: false }));
     expect(await sparkReviewer.review(image, s, licence())).toMatchObject({ verdict: "flag", reasons: expect.arrayContaining(["The product isn't the one in the shot."]) });
+  });
+  it("flags framing and pose with the actual problem, and says the setting differs only when it does", async () => {
+    reply(review({ framingIssues: ["gaze"], notes: "Looks down at the headphones." }));
+    const gaze = await sparkReviewer.review(image, s, licence());
+    expect(gaze).toMatchObject({ verdict: "flag", reasons: ["The person isn't looking where the shot asks.", "Looks down at the headphones."] });
+    expect(gaze.reasons.join(" ")).not.toMatch(/setting/);
+    reply(review({ framingIssues: ["headroom", "crop"] }));
+    expect((await sparkReviewer.review(image, s, licence())).reasons.slice(0, 2)).toEqual(["The head is too close to the top edge (too little headroom).", "Part of the person or the product is cut off by the edge of the frame."]);
+    reply(review({ settingMatches: false }));
+    expect((await sparkReviewer.review(image, s, licence())).reasons[0]).toBe("The setting differs from the shot.");
+    expect(JSON.stringify(bodies()[0].instructions)).toMatch(/Framing, crop, gaze and pose are not the setting/);
+  });
+  it("refuses a framing issue it doesn't know, so the pipeline blocks the image", async () => {
+    reply(review({ framingIssues: ["lighting"] }));
+    await expect(sparkReviewer.review(image, s, licence())).rejects.toThrow(/^INVALID_MODEL_OUTPUT/);
   });
   it("blocks a licence violation (banned content or outside the licensed use)", async () => {
     reply(review({ bannedContent: ["political"] }));

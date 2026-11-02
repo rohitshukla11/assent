@@ -61,7 +61,7 @@ export default function OnboardPage() {
   if (c?.status === "live")
     return (
       <AppPage title="You're live" description="Brands can now request a licence. You approve each one.">
-        <Card tone="lime" title={`Verified creator account: YouTube, ${subscriberLabel(c.channel?.subscriberCount ?? null)}`}>
+        <Card tone="lime" title={c.demo ? "Synthetic demo creator · pre-approved · not YouTube-verified" : `Verified creator account: YouTube, ${subscriberLabel(c.channel?.subscriberCount ?? null)}`}>
           <p className="m-0">Your photos are encrypted with your own key. Only the render service can open them, and every access is logged.</p>
           <Link href="/dashboard" className={pillClass("ink", "self-start")}>
             Go to your dashboard

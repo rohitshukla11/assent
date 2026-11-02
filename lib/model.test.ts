@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { audiencePrice, creatorFee, defaultTerms, licenceStatus, subscriberLabel } from "./model";
+import { audiencePrice, creatorAccountCard, creatorFee, defaultTerms, licenceStatus, subscriberLabel } from "./model";
 
 describe("pricing by audience", () => {
   it("raises the price per image with the channel's audience", () => {
@@ -37,5 +37,21 @@ describe("subscriber labels", () => {
     expect(subscriberLabel(1)).toBe("1 subscriber");
     expect(subscriberLabel(12_300)).toBe("12K subscribers");
     expect(subscriberLabel(1_460_000)).toBe("1.5M subscribers");
+  });
+});
+
+describe("the creator's account card", () => {
+  it("a synthetic demo creator is pre-approved and not YouTube-verified, with no Verified claim", () => {
+    const card = creatorAccountCard({ demo: true, channel: null });
+    expect([card.title, card.value, card.note].join(" · ")).toBe("Synthetic demo creator · Pre-approved · Not YouTube-verified");
+    expect(Object.values(card).join(" ")).not.toMatch(/Verified creator|subscriber|YouTube,/);
+  });
+  it("a real creator keeps the verified card", () => {
+    expect(creatorAccountCard({ demo: false, channel: { subscriberCount: 12_300 } })).toEqual({
+      title: "Verified creator account",
+      value: "YouTube, 12K subscribers",
+      note: "Live face matched to the channel avatar · 18+ self-declared",
+    });
+    expect(creatorAccountCard({ demo: false, channel: { subscriberCount: null } }).value).toBe("YouTube, subscriber count hidden");
   });
 });

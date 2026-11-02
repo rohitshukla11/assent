@@ -5,6 +5,7 @@
  * The model's own policy check (BrandAgent.checkPolicy) runs again on each prompt at render time, in
  * lib/server/filter.ts, and refuses the render if it fails or errors.
  */
+import { utcDay } from "@/lib/dates";
 import { licenceStatus, useLabel, type LicenceDoc } from "@/lib/model";
 import type { RefusalCode, ReviewFinding, ReviewVerdict, ShotDecision, ShotProposal } from "./types";
 
@@ -37,7 +38,7 @@ export function explain(code: RefusalCode, detail = ""): string {
 export function licenceRefusal(l: Pick<LicenceDoc, "revokedAt" | "end" | "renderCount" | "maxRenders">, now = Date.now()): ShotDecision | null {
   const status = licenceStatus(l, now);
   if (status === "Revoked") return { shotId: null, allowed: false, code: "LICENCE_REVOKED", explanation: explain("LICENCE_REVOKED") };
-  if (status === "Expired") return { shotId: null, allowed: false, code: "LICENCE_EXPIRED", explanation: explain("LICENCE_EXPIRED", `It ended on ${new Date(l.end).toISOString().slice(0, 10)}.`) };
+  if (status === "Expired") return { shotId: null, allowed: false, code: "LICENCE_EXPIRED", explanation: explain("LICENCE_EXPIRED", `It ended on ${utcDay(l.end)}.`) };
   if (status === "Exhausted") return { shotId: null, allowed: false, code: "OVER_CAP", explanation: explain("OVER_CAP", `All ${l.maxRenders} renders have been used.`) };
   return null;
 }

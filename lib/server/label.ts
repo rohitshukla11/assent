@@ -1,19 +1,31 @@
 import "server-only";
 /**
- * The visible "AI-generated · licensed likeness" label: small (24% of the width, at least 220 px),
- * semi-transparent, bottom-left in a 4% safe area, moved to another corner if it would cover the face
- * or the area below it (lib/server/framing.ts, labelSpot).
+ * The visible label on every render, "AI-generated" / "licensed likeness" on two lines: white on a
+ * near-black pill (high contrast), its text scaled to the image (LABEL_TEXT_FRACTION of the shorter side,
+ * at least LABEL_MIN_TEXT_PX), in a 4% safe area, in the corner that stays clear of the face and the area
+ * below it (lib/server/framing.ts, labelSpot). Renders made before this keep the label they were made with.
  */
 import sharp from "sharp";
 import { faceBoxes, labelSpot, type Box } from "./framing";
-import { LABEL_AI_RENDER, WATERMARK_PROFILE } from "./watermarks";
+import { LABEL_2L_TEXT_PX, LABEL_AI_RENDER_2L, WATERMARK_PROFILE } from "./watermarks";
 
-export const LABEL_OPACITY = 0.75;
-export const labelWidth = (W: number) => Math.min(W - 16, Math.max(220, Math.round(W * 0.24)));
+export const LABEL_OPACITY = 0.9;
+/** One line of the label's text: 2.75% of the image's shorter side (2.5–3%), at least 16 px. */
+export const LABEL_TEXT_FRACTION = 0.0275;
+export const LABEL_MIN_TEXT_PX = 16;
+const LABEL_PNG = { w: 1000, h: 300 };
+
+/** The label's size for a W×H image, and its text height; never wider than the image's safe area. */
+export function labelSize(W: number, H: number): { w: number; h: number; textPx: number } {
+  const want = Math.max(LABEL_MIN_TEXT_PX, Math.round(Math.min(W, H) * LABEL_TEXT_FRACTION));
+  const margin = Math.round(Math.min(W, H) * 0.04);
+  const scale = Math.min(want / LABEL_2L_TEXT_PX, (W - 2 * margin) / LABEL_PNG.w);
+  return { w: Math.round(LABEL_PNG.w * scale), h: Math.round(LABEL_PNG.h * scale), textPx: Math.round(LABEL_2L_TEXT_PX * scale) };
+}
 
 /** The label PNG at width w, its alpha scaled to LABEL_OPACITY. */
 export async function labelPng(w: number): Promise<{ png: Buffer; w: number; h: number }> {
-  const { data, info } = await sharp(LABEL_AI_RENDER).resize({ width: w }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { data, info } = await sharp(LABEL_AI_RENDER_2L).resize({ width: w }).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   for (let i = 3; i < data.length; i += 4) data[i] = Math.round(data[i] * LABEL_OPACITY);
   const png = await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } }).png().toBuffer();
   return { png, w: info.width, h: info.height };
@@ -30,7 +42,7 @@ export async function facesForLabel(bytes: Uint8Array): Promise<Box[]> {
 export async function labelRender(bytes: Uint8Array): Promise<Buffer> {
   const upright = await sharp(bytes).rotate().jpeg({ quality: 95 }).toBuffer();
   const { width = 1024, height = 1024 } = await sharp(upright).metadata();
-  const label = await labelPng(labelWidth(width));
+  const label = await labelPng(labelSize(width, height).w);
   const spot = labelSpot(width, height, label, await facesForLabel(new Uint8Array(upright)));
   return sharp(upright).composite([{ input: label.png, left: spot.x, top: spot.y }]).jpeg({ quality: 92 }).toBuffer();
 }

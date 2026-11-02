@@ -21,4 +21,14 @@ export const LEGAL_SITE = "https://bionic-carving-140911.firebaseapp.com";
 export const PRIVACY_URL = `${LEGAL_SITE}/privacy`;
 export const TERMS_URL = `${LEGAL_SITE}/terms`;
 
-export const BUILT_ON = ["Vertex AI Gemini", "Firebase", "YouTube", "Cloud KMS", "Cloud Run", "C2PA"];
+/** The "Built on" strip: Meta's models first (Vertex AI Gemini is only the fallback provider, see the README). */
+export const BUILT_ON: { name: string; role: string }[] = [
+  { name: "Meta Muse Spark", role: "brand agent, policy check, reviewer" },
+  { name: "Meta Muse Image", role: "image generation" },
+  { name: "Meta SAM 3.1", role: "consent gate" },
+  { name: "Firebase", role: "sign-in and data" },
+  { name: "Cloud Run", role: "hosting" },
+  { name: "Cloud KMS", role: "signed receipts and encrypted references" },
+  { name: "C2PA", role: "content credentials" },
+  { name: "YouTube", role: "creator verification" },
+];

@@ -3,6 +3,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { AppPage, Card, StatusPill, pillClass } from "@/components/ds";
 import { reason } from "@/lib/client/firebase";
+import { c2paLine, type ManifestView } from "@/lib/verifyText";
 
 type Result = {
   verdict: "Licensed" | "Expired" | "Revoked" | "Unknown";
@@ -11,7 +12,7 @@ type Result = {
   receipt: { valid: boolean; keyVersion: string; payload: { renderType: string; createdAt: number; model: string } } | null;
   licence: { id: string; use: string; status: string; renders: string; licensee: string } | null;
   creator: { displayName: string; demo: boolean; channel: { title: string } | null } | null;
-  manifest: { present: boolean; signatureValid?: boolean; trustedSigner?: boolean; matchesReceipt?: boolean };
+  manifest: ManifestView;
   notes: string[];
 };
 
@@ -89,7 +90,7 @@ function Verify() {
             Signed receipt: {r.receipt ? (r.receipt.valid ? `valid (Cloud KMS, ${r.receipt.payload.renderType}, ${r.receipt.payload.model})` : "signature does not verify") : "none for these exact bytes"}
           </span>
           <span>
-            Content credential (C2PA): {r.manifest.present ? `${r.manifest.signatureValid ? "intact" : "broken"}${r.manifest.trustedSigner ? "" : ", test certificate"}${r.manifest.matchesReceipt ? ", matches the receipt" : ""}` : "none"}
+            Content credential (C2PA): {c2paLine(r.manifest)}
           </span>
           {r.notes.map((n) => (
             <span key={n} className="text-[14px] text-grey">

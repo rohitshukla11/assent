@@ -28,7 +28,7 @@ describe("shot decisions", () => {
   it("refuses an expired licence and says when it ended", () => {
     const r = licenceRefusal(licence({ end: now - 1 }), now)!;
     expect(r.code).toBe("LICENCE_EXPIRED");
-    expect(r.explanation).toMatch(/expired\. It ended on 2026-10-31/);
+    expect(r.explanation).toMatch(/expired\. It ended on 31 Oct 2026 \(UTC\)/);
   });
 
   it("refuses shots beyond the renders left (over cap)", () => {

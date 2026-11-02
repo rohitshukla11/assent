@@ -18,6 +18,7 @@ import { blockedSentence } from "@/lib/reasons";
 import { createHash, randomBytes } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import sharp from "sharp";
+import { utcDay } from "@/lib/dates";
 import { capRefusal, creatorFee, licenceStatus, useLabel, type DailyCaps, type DailyUsage, type LicenceDoc, type ReceiptPayload } from "@/lib/model";
 import type { Aspect } from "@/lib/creative";
 import { ai, aiProvider, assertAspect } from "./ai";
@@ -429,7 +430,7 @@ async function runPipeline(log: RenderLog, renderId: string, brandUid: string, l
     () => preflight(brandUid, licenceId),
     ({ licence: l, price: p }) => ({
       status: "ok",
-      detail: `Licence active for ${useLabel(l.use)}: ${l.renderCount} of ${l.maxRenders} renders used, ${p} credits per image, until ${new Date(l.end).toISOString().slice(0, 10)}.`,
+      detail: `Licence active for ${useLabel(l.use)}: ${l.renderCount} of ${l.maxRenders} renders used, ${p} credits per image, until ${utcDay(l.end)}.`,
     }),
   );
   log.setCreator(licence.creatorId);

@@ -4,13 +4,15 @@ import { Card, StatCard, pillClass } from "@/components/ds";
 import { StatusBadge } from "@/components/ui";
 import type { Me } from "@/components/auth/AuthProvider";
 import { CATEGORIES } from "@/lib/categories";
+import { utcDay } from "@/lib/dates";
 import { api, reason } from "@/lib/client/firebase";
-import { credits, subscriberLabel, useLabel, type Terms } from "@/lib/model";
+import { creatorAccountCard, credits, useLabel, type Terms } from "@/lib/model";
 import { BlockedCard, RenderCard } from "./RenderCard";
 import { useApi, when, type BlockedRender, type Lists, type Render } from "./shared";
 
 export function CreatorDashboard({ me, refresh }: { me: Me; refresh: () => Promise<void> }) {
   const c = me.creator!;
+  const card = creatorAccountCard(c);
   const lists = useApi<Lists>("/api/licences");
   const renders = useApi<{ asCreator: Render[]; blockedAsCreator: BlockedRender[] }>("/api/renders");
   const log = useApi<{ decryptions: { licenceId: string; renderId: string; by: string; label?: string; at: number }[] }>("/api/creator/decryptions");
@@ -41,9 +43,9 @@ export function CreatorDashboard({ me, refresh }: { me: Me; refresh: () => Promi
         <StatCard label="Earned (demo credits)" value={credits(me.credits)} note="after the 10% fee" />
         <StatCard label="Active licences" value={licences.filter((l) => l.status === "Active").length} note={`${pending.length} request${pending.length === 1 ? "" : "s"} waiting`} />
         <Card tone="violet">
-          <span className="text-[14px] font-semibold">Verified creator account</span>
-          <span className="text-[18px] font-bold">YouTube, {subscriberLabel(c.channel?.subscriberCount ?? null)}</span>
-          <span className="text-[13px]">{c.demo ? "Synthetic demo creator" : `Live face matched to the channel avatar · 18+ self-declared`}</span>
+          <span className="text-[14px] font-semibold">{card.title}</span>
+          <span className="text-[18px] font-bold">{card.value}</span>
+          <span className="text-[13px]">{card.note}</span>
         </Card>
       </div>
 
@@ -76,7 +78,7 @@ export function CreatorDashboard({ me, refresh }: { me: Me; refresh: () => Promi
             <StatusBadge status={l.status} />
             <span className="font-semibold">{l.brandName}</span>
             <span className="text-grey">
-              {useLabel(l.use)} · {l.renderCount}/{l.maxRenders} renders · until {when(l.end)}
+              {useLabel(l.use)} · {l.renderCount}/{l.maxRenders} renders · until {utcDay(l.end)}
             </span>
             {l.status === "Active" && (
               <button type="button" disabled={busy} onClick={() => act(() => api(`/api/licences/${l.id}/revoke`, { method: "POST" }), "Revoked: new renders under this licence are refused.")} className={pillClass("danger", "ml-auto min-h-10 px-4")}>

@@ -167,5 +167,14 @@ export function subscriberLabel(n: number | null): string {
   return `${n} subscriber${n === 1 ? "" : "s"}`;
 }
 
+/**
+ * The creator's account card (dashboard, "You're live"): a real creator's checks, or, for a synthetic demo
+ * creator (no YouTube channel, no live face check), what it is instead, with no "Verified" claim.
+ */
+export function creatorAccountCard(c: { demo: boolean; channel: { subscriberCount: number | null } | null }): { title: string; value: string; note: string } {
+  if (c.demo) return { title: "Synthetic demo creator", value: "Pre-approved", note: "Not YouTube-verified" };
+  return { title: "Verified creator account", value: `YouTube, ${subscriberLabel(c.channel?.subscriberCount ?? null)}`, note: "Live face matched to the channel avatar · 18+ self-declared" };
+}
+
 export const CONSENT_TEXT =
   "I am 18 or older (self-declared). I license my likeness to brands that I approve one by one, for the uses and prices in my terms. Each image made under a licence is labelled AI-generated, carries a content credential and a signed receipt. I can revoke any licence at any time; new renders are then refused.";

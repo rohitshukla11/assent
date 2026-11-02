@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, reason } from "@/lib/client/firebase";
 import type { Aspect } from "@/lib/creative";
+import { utcDateTime } from "@/lib/dates";
 import type { LicenceDoc, LicenceStatus, RequestDoc } from "@/lib/model";
 
 export type LicenceRow = LicenceDoc & { status: LicenceStatus };
@@ -42,7 +43,15 @@ export type Render = {
   alternativeId?: string;
 };
 
-export const pipelineLabel = (r: Pick<Render, "model">) => `Gemini (${r.model})`;
+/** Which model made a render: Meta Muse Image by default, Vertex AI Gemini only as the fallback provider. */
+export const pipelineLabel = (r: Pick<Render, "model">) =>
+  r.model.startsWith("muse")
+    ? `Meta Muse Image (${r.model})`
+    : r.model.startsWith("gemini")
+      ? `Vertex AI Gemini (${r.model}), fallback provider`
+      : r.model.startsWith("fixture:")
+        ? `development fixture (${r.model.slice("fixture:".length)})`
+        : r.model;
 export type Lists = {
   asCreator: { requests: RequestDoc[]; licences: LicenceRow[] };
   asBrand: { requests: RequestDoc[]; licences: LicenceRow[] };
@@ -73,4 +82,5 @@ export async function openRender(id: string) {
   window.open(r.url, "_blank", "noopener");
 }
 
-export const when = (ms: number) => new Date(ms).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+/** In UTC, labelled, like every date in the app (lib/dates.ts). */
+export const when = utcDateTime;

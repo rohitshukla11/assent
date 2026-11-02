@@ -24,6 +24,11 @@ describe("daily caps", () => {
   it("stop a brand at 3 ads a day", () => {
     expect(capRefusal(none, { renders: 3 }, caps)).toMatch(/today's 3 ads, the daily limit per brand/);
   });
+  it("count blocked images toward the limit, and say so", () => {
+    expect(capRefusal(none, { renders: 2, blocked: 1 }, caps)).toMatch(/today's 3 ads \(1 image the consent check or reviewer blocked count too\)/);
+    expect(capRefusal(none, { renders: 1, blocked: 1 }, caps)).toBeNull();
+    expect(capRefusal({ renders: 30, blocked: 10 }, none, caps)).toMatch(/today's 40 ads across all brands/);
+  });
   it("stop everyone at the site-wide limit, with a friendly reason", () => {
     expect(capRefusal({ renders: 40 }, none, caps)).toMatch(/today's 40 ads across all brands/);
     expect(capRefusal({ renders: 12 }, none, caps)).toBeNull();

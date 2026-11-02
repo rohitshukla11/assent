@@ -94,3 +94,12 @@ describe("alternative shot", () => {
     expect(p.attempts).toHaveLength(1);
   });
 });
+
+describe("which reasons get an alternative", () => {
+  it("a reviewer's block (automatically) and a flag (when the brand asks), as well as the policy refusals", async () => {
+    const { retryable } = await import("./alternative");
+    for (const c of ["REVIEW_BLOCKED", "REVIEW_FLAG", "BANNED_USE", "OUTSIDE_LICENSED_USE", "EMPTY_BRIEF"]) expect(retryable(c), c).toBe(true);
+    for (const c of ["MODEL_REFUSED", "GATE_ERROR", "MULTIPLE_PEOPLE", null]) expect(retryable(c), String(c)).toBe(false);
+  });
+});
+

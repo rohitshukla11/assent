@@ -43,7 +43,7 @@ export default function CreatorPage({ params }: { params: Promise<{ id: string }
           )}
           <span className="text-[14px] text-grey">
             {c.demo
-              ? "Synthetic demo creator: a face generated with Gemini, not a real person. No YouTube channel."
+              ? "Synthetic demo creator, not a real person. No YouTube channel."
               : `Channel ownership proven with YouTube sign-in. Live face matched to the channel avatar${c.faceMatch ? ` (score ${c.faceMatch.score})` : ""}. Age 18+ self-declared; legal identity not checked.`}
           </span>
         </Card>

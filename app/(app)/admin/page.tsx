@@ -10,6 +10,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { ErrorNotice } from "@/components/dashboard/ErrorNotice";
 import { RenderTimeline } from "@/components/dashboard/RenderTimeline";
 import { api } from "@/lib/client/firebase";
+import { utcDateTime } from "@/lib/dates";
 
 type Totals = { key: string; renders: number; delivered: number; blocked: number; refused: number; error: number; costUsd: number; avgLatencyMs: number | null };
 type Step = { step: string; status: string; ms: number; costUsd: number | null; model: string | null; code: string | null; attempt: number };
@@ -23,7 +24,7 @@ type Overview = {
 
 const usd = (n: number | null) => (n === null ? "—" : `$${n.toFixed(4)}`);
 const secs = (ms: number | null) => (ms === null ? "—" : `${(ms / 1000).toFixed(1)} s`);
-const when = (t: number) => new Date(t).toISOString().replace("T", " ").slice(0, 16);
+const when = utcDateTime;
 const th = "border-b border-divider px-2 py-1 text-left font-semibold";
 const td = "border-b border-divider px-2 py-1 align-top";
 

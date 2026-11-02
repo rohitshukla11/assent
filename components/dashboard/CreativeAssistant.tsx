@@ -7,7 +7,8 @@ import { ErrorNotice } from "./ErrorNotice";
 import { DEFAULT_INPUT, MOODS, TEMPLATES, type Aspect, type AssistantDraft, type AssistantInput } from "@/lib/creative";
 
 /**
- * "✨ Write it for me": a few optional inputs → a detailed prompt from Gemini, which fills the Brief
+ * "✨ Write it for me": a few optional inputs → a detailed prompt from the brand agent (Muse Spark; Gemini
+ * only when the fallback provider is on), which fills the Brief
  * box. Free; text only. Everything it writes stays editable.
  */
 export function CreativeAssistant({ licenceId, aspects, onDraft }: { licenceId: string; aspects: Aspect[]; onDraft: (d: AssistantDraft) => void }) {

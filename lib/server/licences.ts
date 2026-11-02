@@ -4,6 +4,7 @@ import { randomBytes } from "node:crypto";
 import { autoApproves, licenceStatus, type LicenceDoc, type RequestDoc } from "@/lib/model";
 import { getBrand } from "./accounts";
 import { getCreator } from "./creators";
+import { judgeRegistryCached } from "./demo";
 import { firestore } from "./firebase-admin";
 import { HttpError } from "./http";
 
@@ -68,13 +69,21 @@ export async function decide(creatorUid: string, requestId: string, approve: boo
   });
 }
 
+/**
+ * The eval brand's licence (scripts/eval.ts, automated test runs) with the judge creator: like the eval
+ * renders, the creator never sees it and can't revoke it; the admin view lists it.
+ */
+const isEvalLicence = (l: Pick<LicenceDoc | RequestDoc, "brandId">, evalBrandUid: string | undefined) => !!evalBrandUid && l.brandId === evalBrandUid;
+
 export async function revoke(creatorUid: string, licenceId: string): Promise<LicenceDoc> {
+  const evalBrandUid = (await judgeRegistryCached())?.evalBrandUid;
   return db().runTransaction(async (tx) => {
     const ref = db().collection("licences").doc(licenceId);
     const s = await tx.get(ref);
     if (!s.exists) throw new HttpError(404, "no such licence");
     const l = s.data() as LicenceDoc;
     if (l.creatorId !== creatorUid) throw new HttpError(403, "only the creator can revoke this licence");
+    if (isEvalLicence(l, evalBrandUid)) throw new HttpError(403, "this is the evaluation licence for automated test runs; it can't be revoked", "EVAL_LICENCE");
     if (l.revokedAt) return l;
     const revokedAt = Date.now();
     tx.update(ref, { revokedAt });
@@ -90,12 +99,14 @@ export async function getLicence(id: string): Promise<LicenceDoc | null> {
 
 const withStatus = (l: LicenceDoc) => ({ ...l, status: licenceStatus(l) });
 
+/** A creator's or a brand's requests and licences; a creator's leave out the eval brand's. */
 export async function listFor(field: "creatorId" | "brandId", uid: string) {
   // Equality filter only, sorted here: no composite index needed on a fresh database.
-  const [req, lic] = await Promise.all([db().collection("requests").where(field, "==", uid).limit(200).get(), db().collection("licences").where(field, "==", uid).limit(200).get()]);
+  const [req, lic, judges] = await Promise.all([db().collection("requests").where(field, "==", uid).limit(200).get(), db().collection("licences").where(field, "==", uid).limit(200).get(), field === "creatorId" ? judgeRegistryCached() : null]);
+  const shown = (x: Pick<LicenceDoc, "brandId">) => !isEvalLicence(x, judges?.evalBrandUid);
   const newest = <T extends { createdAt: number }>(a: T, b: T) => b.createdAt - a.createdAt;
   return {
-    requests: req.docs.map((d) => d.data() as RequestDoc).sort(newest),
-    licences: lic.docs.map((d) => withStatus(d.data() as LicenceDoc)).sort(newest),
+    requests: req.docs.map((d) => d.data() as RequestDoc).filter(shown).sort(newest),
+    licences: lic.docs.map((d) => withStatus(d.data() as LicenceDoc)).filter(shown).sort(newest),
   };
 }

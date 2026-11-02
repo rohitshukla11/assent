@@ -32,6 +32,7 @@ export const REASONS = {
   DAILY_LIMIT: { title: "Daily limit reached", next: plain("Try again after 00:00 UTC. Images the consent check blocked count toward the limit too.") },
   RENDER_CONFLICT: { title: "Another render finished first", next: plain("Two renders on this licence finished at once; this one wasn't charged. Try again.", "retry") },
   NO_CREATOR: { title: "Creator not found", next: plain("The creator may have left. Choose another creator.", "find-creator") },
+  EVAL_LICENCE: { title: "Evaluation licence", next: plain("This licence is kept for automated test runs and can't be revoked. Your other licences are unaffected.") },
   // The brief and the policy check
   EMPTY_BRIEF: { title: "Empty brief", next: plain("Describe the shot in a few words, then try again.", "edit-brief") },
   NO_RENDER: { title: "Render not found", next: plain("Reload the page; the image may belong to another account.") },

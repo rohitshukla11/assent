@@ -1,6 +1,9 @@
 {
-  "name": "likeness-meta",
-  "version": "0.1.0",
+  "name": "assent",
+  "version": "1.0.0",
+  "description": "Assent: consent, licensing and per-use payment for AI images of real people, built on Meta's Muse Spark, Muse Image and SAM 3.1. Your face. Your terms. Your yes.",
+  "license": "MIT",
+  "author": "Rohit Shukla",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -20,8 +23,7 @@
     "render:check": "tsx --conditions=react-server scripts/render-check.ts",
     "reset:eval": "tsx --conditions=react-server scripts/reset-eval.ts",
     "eval:fixtures": "tsx --conditions=react-server scripts/eval-fixtures.ts",
-    "eval": "tsx --conditions=react-server scripts/eval.ts",
-    "e2e:smoke": "tsx --conditions=react-server scripts/e2e-smoke.ts"
+    "eval": "tsx --conditions=react-server scripts/eval.ts"
   },
   "dependencies": {
     "@contentauth/c2pa-node": "0.9.9",

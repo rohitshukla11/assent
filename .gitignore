@@ -44,3 +44,16 @@ next-env.d.ts
 # local ciphertext store (dev only)
 .data/
 .models/
+
+# local secrets (test C2PA cert and key, judge passwords, render-check output): never committed
+.secrets/
+*.key
+# face-matcher weights (downloaded by scripts/face-models.sh into .models/)
+*.onnx
+# local eval and demo outputs (generated images)
+.data-demo/
+# logs, editor and tool folders
+*.log
+.idea/
+.vscode/
+.claude/
