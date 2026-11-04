@@ -313,46 +313,6 @@ licence, reset before and after, and writes `eval/results.md`:
 | `reset:eval` | Restores the eval licence and the eval brand's credits; never the judge accounts. |
 | `eval` | Runs the evaluation (see above). |
 
-## Built during the hackathon, and before
-
-**Before 27 Oct 2026: likeness-ai** ([rohitshukla11/likeness-ai](https://github.com/rohitshukla11/likeness-ai)).
-Rohit built likeness-ai for the AI Builder Cup 2026 (Google Cloud), 10–18 Oct 2026. Assent starts from its web
-app, copied into this repository; likeness-ai itself is not modified. It already had:
-- Google sign-in, YouTube channel verification, and a live face check matched to the channel avatar (YuNet + AuraFace).
-- Creators' reference photos encrypted with their own key under Cloud KMS, with an access log.
-- Creator terms with audience-based pricing.
-- Licence requests, approval and revocation.
-- Demo credits with a 90/10 split.
-- Image (Gemini) and video (Veo) ads, and the "Write it for me" assistant.
-- The banned-use keyword rules and the Gemini prompt classifier.
-- The visible label, the C2PA credential, KMS-signed receipts and `/verify`.
-- The landing page and the synthetic demo creators.
-
-**Built 27 Oct – 4 Nov 2026, in this repository:**
-- **The Meta provider layer:** the Muse Spark brand agent, policy check, output reviewer and alternative shot;
-  Muse Image generation; the SAM 3.1 consent gate.
-- **Decisions in code:** the "model proposes, code decides" policy code, and the consent gate on every generated
-  image (one person, matching face).
-- **Render pipeline:**
-  - the step log, the live timeline and the consent figure;
-  - idempotent renders;
-  - daily limits, rate limits and a spending cap;
-  - reason codes and error cards.
-- **Demo and admin tools:** judge mode (seeded accounts, "Reset demo"), the admin view, the fixture provider and
-  the eval harness with its results.
-- **Assent itself:** the rename, the label scaled to each image, and the Cloud Run service `assent`.
-- **Removed:** video generation, to focus on images.
-
-Every reused, modified, new and removed file is listed in [`CHANGES.md`](CHANGES.md). Three things carry over
-on purpose:
-- **Identifiers:** the C2PA licence assertion label `xyz.likeness.licence` and its protocol `likeness-ai/1` are
-  unchanged, so files keep reading and verifying the same way.
-- **The screening instruction:** the policy check's instruction (`FILTER_INSTRUCTION`, now in
-  [`lib/server/ai/prompts.ts`](lib/server/ai/prompts.ts)) is likeness-ai's text, unchanged. Muse Spark uses it
-  here.
-- **Maya Okafor:** the demo creator is a synthetic demo creator (a generated face, not a real person) carried
-  over from likeness-ai.
-
 ## Known limitations
 
 - **No 16:9 or 9:16.** With Meta, images are 1:1, 3:2 or 2:3. Muse Image accepted 1024×1024, 1536×1024 and
