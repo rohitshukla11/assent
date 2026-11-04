@@ -11,7 +11,7 @@ labelled, signed and paid for per use. The creator can revoke at any time, and a
 `/verify`.
 
 - **Live:** https://assent-1000899129252.us-central1.run.app
-- **Demo video:** VIDEO_URL
+- **Demo video:** https://youtu.be/uQ8K6itjA6o
 - **Built for:** Meta Global AI Developer Hackathon, Indie track
 - **Runs on:** Meta Muse Spark, Muse Image and SAM 3.1, on Google Cloud (Cloud Run, Firestore, Cloud Storage,
   Cloud KMS, Secret Manager, Firebase Authentication)
